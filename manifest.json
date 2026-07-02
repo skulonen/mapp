@@ -1,0 +1,16 @@
+{
+  "name": "Mapp",
+  "icons": [
+    {
+      "src": "mapp.svg",
+      "sizes": "any"
+    }
+  ],
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "description": "Simple mapping app",
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  }
+}

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="mapp.svg">
+    <link rel="manifest" href="manifest.json" />
+    <title>Mapp</title>
+    <script type="module" src="https://js.arcgis.com/5.1/"></script>
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <arcgis-map center="24.944, 60.164" zoom="12" basemap="osm">
+      <arcgis-search slot="top-left" popup-disabled></arcgis-search>
+
+      <arcgis-compass slot="top-right"></arcgis-compass>
+      <arcgis-zoom slot="top-right"></arcgis-zoom>
+      <arcgis-track slot="top-right" rotation-disabled></arcgis-track>
+
+      <arcgis-expand slot="top-right" group="top-left" mode="floating">
+        <arcgis-bookmarks show-add-bookmark-button show-edit-bookmark-button></arcgis-bookmarks>
+      </arcgis-expand>
+      <arcgis-expand slot="top-right" group="top-left" mode="floating">
+        <arcgis-distance-measurement-2d unit="metric" hide-unit-select></arcgis-distance-measurement-2d>
+      </arcgis-expand>
+      <arcgis-expand slot="top-right" group="top-left" mode="floating">
+        <arcgis-area-measurement-2d unit="metric" hide-unit-select></arcgis-area-measurement-2d>
+      </arcgis-expand>
+
+      <arcgis-scale-bar slot="bottom-right" unit="metric"></arcgis-scale-bar>
+
+      <arcgis-basemap-toggle slot="bottom-left" next-basemap="hybrid"></arcgis-basemap-toggle>
+    </arcgis-map>
+
+    <script type="module">
+      const [Bookmark, Collection, Viewpoint] = await $arcgis.import([
+        "@arcgis/core/webmap/Bookmark.js",
+        "@arcgis/core/core/Collection.js",
+        "@arcgis/core/Viewpoint.js",
+      ]);
+
+      const mapElement = document.querySelector("arcgis-map");
+      const bookmarksElement = document.querySelector("arcgis-bookmarks");
+
+      const viewpointString = localStorage.getItem("arcgis-map-viewpoint");
+      if (viewpointString) {
+        const viewpointJSON = JSON.parse(viewpointString);
+        const viewpoint = Viewpoint.fromJSON(viewpointJSON);
+        mapElement.viewpoint = viewpoint;
+      }
+
+      const bookmarksString = localStorage.getItem("arcgis-bookmarks-bookmarks");
+      if (bookmarksString) {
+        const bookmarksJSON = JSON.parse(bookmarksString);
+        const bookmarks = new Collection(bookmarksJSON.map((bookmarkJSON) => Bookmark.fromJSON(bookmarkJSON)));
+        bookmarksElement.bookmarks = bookmarks;
+      }
+
+      mapElement.addEventListener("arcgisViewChange", (event) => {
+        if (mapElement.ready && mapElement.stationary) {
+          const viewpointJSON = mapElement.viewpoint.toJSON();
+          const viewpointString = JSON.stringify(viewpointJSON);
+          localStorage.setItem("arcgis-map-viewpoint", viewpointString);
+        }
+      });
+
+      function storeBookmarks() {
+        const bookmarksJSON = bookmarksElement.bookmarks.map((bookmark) => bookmark.toJSON()).toArray();
+        const bookmarksString = JSON.stringify(bookmarksJSON);
+        localStorage.setItem("arcgis-bookmarks-bookmarks", bookmarksString);
+      }
+      bookmarksElement.bookmarks.on("change", storeBookmarks);
+      bookmarksElement.addEventListener("arcgisBookmarkEdit", storeBookmarks);
+    </script>
+  </body>
+</html>
