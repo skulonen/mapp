@@ -17,7 +17,7 @@
   </head>
 
   <body>
-    <arcgis-map center="24.944, 60.164" zoom="12" basemap="osm">
+    <arcgis-map center="24.944, 60.164" zoom="12">
       <arcgis-search slot="top-left" popup-disabled></arcgis-search>
 
       <arcgis-compass slot="top-right"></arcgis-compass>
@@ -36,11 +36,12 @@
 
       <arcgis-scale-bar slot="bottom-right" unit="metric"></arcgis-scale-bar>
 
-      <arcgis-basemap-toggle slot="bottom-left" next-basemap="hybrid"></arcgis-basemap-toggle>
+      <arcgis-basemap-toggle slot="bottom-left"></arcgis-basemap-toggle>
     </arcgis-map>
 
     <script type="module">
-      const [Bookmark, Collection, Viewpoint] = await $arcgis.import([
+      const [Basemap, Bookmark, Collection, Viewpoint] = await $arcgis.import([
+        "@arcgis/core/Basemap.js",
         "@arcgis/core/webmap/Bookmark.js",
         "@arcgis/core/core/Collection.js",
         "@arcgis/core/Viewpoint.js",
@@ -48,6 +49,21 @@
 
       const mapElement = document.querySelector("arcgis-map");
       const bookmarksElement = document.querySelector("arcgis-bookmarks");
+      const basemapToggleElement = document.querySelector("arcgis-basemap-toggle");
+
+      mapElement.basemap = new Basemap({
+        portalItem: {
+          // OpenStreetMap Style (with Relief)
+          id: "d3b04b4e7a844d1e85ce07a67a6d8f86"
+        }
+      });
+
+      basemapToggleElement.basemap = new Basemap({
+        portalItem: {
+          // Open Basemap (Imagery Hybrid)
+          id: "ae04a03962e4487c9bc0af644a472437"
+        }
+      });
 
       const viewpointString = localStorage.getItem("arcgis-map-viewpoint");
       if (viewpointString) {
