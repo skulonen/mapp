@@ -77,6 +77,8 @@
         const bookmarksJSON = JSON.parse(bookmarksString);
         const bookmarks = new Collection(bookmarksJSON.map((bookmarkJSON) => Bookmark.fromJSON(bookmarkJSON)));
         bookmarksElement.bookmarks = bookmarks;
+      } else {
+        bookmarksElement.bookmarks = new Collection();
       }
 
       mapElement.addEventListener("arcgisViewChange", (event) => {
