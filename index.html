@@ -48,6 +48,7 @@
       ]);
 
       const mapElement = document.querySelector("arcgis-map");
+      const trackElement = document.querySelector("arcgis-track");
       const bookmarksElement = document.querySelector("arcgis-bookmarks");
       const basemapToggleElement = document.querySelector("arcgis-basemap-toggle");
 
@@ -62,6 +63,26 @@
         portalItem: {
           // Open Basemap (Imagery Hybrid)
           id: "ae04a03962e4487c9bc0af644a472437"
+        }
+      });
+
+      let goToLocationEnabled = true;
+      trackElement.geolocationOptions = {
+        enableHighAccuracy: true,
+      };
+      trackElement.goToOverride = (view, goToParameters) => {
+        if (goToLocationEnabled) {
+          goToLocationEnabled = false;
+          view.goTo(goToParameters.target, goToParameters.options);
+        }
+      };
+      trackElement.addEventListener("arcgisPropertyChange", (event) => {
+        if (
+          event.detail.name == "state" &&
+          trackElement.state != "waiting" &&
+          trackElement.state != "tracking"
+        ) {
+          goToLocationEnabled = true;
         }
       });
 
